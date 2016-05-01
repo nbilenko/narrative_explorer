@@ -1,0 +1,161 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.min.css') }}" />
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/tipsy.css') }}"/>
+<link rel="stylesheet" type="text/css" href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css" />
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/d3.slider.css') }}" />
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/colorbrewer.css') }}"/>
+<script type="text/javascript" src="{{ url_for('static', filename='js/d3.v3.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/jquery-1.10.1.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/jquery-ui.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/jquery.tipsy.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/jquery.mjs.nestedSortable.js')}}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+</head>
+<body>
+
+<div id="vis_title">
+<h1>NARRATIVE EXPLORER</h1>
+<h3>Visual explorer of character co-occurrence and sentiment trajectory in written texts</h3>
+</div>
+
+<div id="about">
+<button type="button" class="btn btn-default btn-file" id="about_button">
+	About
+</button>
+</div>
+
+<div id="about_modal" class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" id="close_about">&times;</button>
+            <h4 class="modal-title">About this visualization</h4>
+        </div>
+        <div class="modal-body">
+		Choose a text from the database or upload your own text file to create a new visualization.<br><br>
+		The sentiment rating of each sentence in the story is shown on a scale from strongly negative to strongly positive. Mouse over each bar to read the sentence.<br><br>
+		The co-occurrences of the characters in the story are displayed in a chord diagram. Click a character's name to highlight the sentences in which they appear. Drag the handles on the sentiment graph to choose a segment of the story.<br><br>
+		<!-- Created by <a href="http://nbilenko.com">Natalia Bilenko</a>, 2016. -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" id="close_about_button">
+			Close
+		</button>
+        </div>
+    </div>
+</div>
+
+
+<div id="control_panel">
+<div id="selectbook_div">
+<div id="selectbook_button" class="btn-group">
+    <button type="button" data-toggle="dropdown" class="btn btn-default dropdown-toggle">Select visualization <span class="caret"></span></button>
+    <ul class="dropdown-menu" id="selectbook_dropdown">
+    	{% for book in books %}
+    	<li><a value="{{ book.id }}" id="select_book{{ book.id }}">{{ book.title }}</a></li>
+		{% endfor %}
+    </ul>
+</div>
+</div>
+
+<div id="uploadfile_div">
+<form id="uploadform" method="post" enctype="multipart/form-data">
+<span class="btn btn-default btn-file" id="uploadbook_button">
+    Upload new text <input name="file" type="file" onchange="uploadpressed()">
+</span>
+</form>
+</div>
+
+<div id="editchars_div" style="visibility:hidden;">
+<button type="button" class="btn btn-default btn-file" id="editchars_button">
+	Edit characters
+</button>
+</div>
+
+<div id="saveviz_div" style="visibility:hidden;">
+<button type="button" class="btn btn-default btn-file" id="saveviz_button">
+	Save visualization
+</button>
+</div>
+
+<div id="exportdata_div" style="visibility:hidden;">
+<button type="button" class="btn btn-default btn-file" id="exportdata_button">
+	Export data
+</button>
+</div>
+</div>
+
+<div id="copyoutput" class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" id="close_copyoutput">&times;</button>
+            <h4 class="modal-title">Export data</h4>
+        </div>
+        <div class="modal-body">
+            <textarea id="outputtext"></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" id="copyjson">
+			Copy data to clipboard
+		</button>
+        </div>
+    </div>
+</div>
+
+<div id="book_title">
+<form><h1><input type="hidden" name="hiddenField" /></h1></form>
+<h2><span id="bookTitle" class="bookTitle" title="Click to edit title" style="visibility: hidden;">Click to edit title</span></h2>
+</div>
+
+<div id="sentiment">
+</div>
+
+
+<div id="interactor" class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" id="close_interactor">&times;</button>
+            <h4 class="modal-title">Edit characters</h4>
+            <span style="margin-left:10px; margin-right:10px; display:block;">Edit the list of characters to be visualized. Names can be added, edited, or deleted. Group alternate names for the same character under one main name. Experiment with the size of the character co-occurrence window.</span>
+        </div>
+        <div class="modal-body" id="charselector">
+        	<h4>Character list</h4>
+        	<div id="charslist" class="charslist">
+			<ol id="characters" class="sortable ui-sortable mjs-nestedSortable-branch mjs-nestedSortable-expanded">
+			</ol>
+		</div>
+        </div>
+        <div class="modal-footer">
+        	<span style="font-size:14px;">Co-occurrence window (sentences): </span>
+    	<div id="charwindow_button" class="btn-group">
+	    <button type="button" data-toggle="dropdown" class="btn btn-default dropdown-toggle" id="charwindow_menu" value="5">5 <span class="caret"></span></button>
+	    <ul class="dropdown-menu scrollable-menu charwindow">
+	   	<li><a href="#" data-value="3">3</a></li>
+	    <li><a href="#" data-value="5">5</a></li>
+	    <li><a href="#" data-value="7">7</a></li>
+	    <li><a href="#" data-value="9">9</a></li>
+	    <li><a href="#" data-value="11">11</a></li>
+	    <li><a href="#" data-value="13">13</a></li>
+	    <li><a href="#" data-value="15">15</a></li>
+	    <li><a href="#" data-value="17">17</a></li>
+	    <li><a href="#" data-value="19">19</a></li>
+	    <li><a href="#" data-value="21">21</a></li>
+	    </ul>
+		</div>
+        </div>
+        <div class="modal-footer">
+			<button type="button" class="btn btn-default btn-file" id="addChar">Add character</button>
+			<button type="button" class="btn btn-primary btn-file" id="submit_chars">Update visualization</button>
+        </div>
+    </div>
+</div>
+
+<div id="visualization">
+</div>
+
+<script type="text/javascript" src="{{ url_for('static', filename='js/main.js') }}"></script>
+<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/style.css')}}">
+</body>
+</html>

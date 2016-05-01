@@ -1,0 +1,346 @@
+html {
+	background-color: #fff;
+}
+
+body {
+	-webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
+	border-radius: 10px;
+	color: #000;
+	background-color: #fff;
+	font-size: 12px;
+	font-family: "Roboto", Helvetica, Arial, sans-serif;
+	padding: 2em 4em;
+	width: 1065px;
+	margin: 15px auto;
+	box-shadow: 1px 1px 8px #000;
+	-mox-box-shadow: 1px 1px 8px #000;
+	-webkit-box-shadow: 1px -1px 8px #000;
+}
+
+h1 {
+	font-family: "Roboto", Helvetica, Arial, sans-serif;
+	font-size: 36px;
+	font-weight: 600px;
+}
+
+h2 {
+	font-family: "Palatino", "Georgia", "times new roman", serif;
+	font-size: 32px;
+	font-weight: 500;
+	margin-left: 40px;
+}
+
+h3 {
+	font-family: "Roboto", Helvetica, Arial, sans-serif;
+	font-weight: 200;
+	font-size: 18px;
+	margin-top: -10px;
+}
+
+h4 {
+	font-family: "Roboto", Helvetica, Arial, sans-serif;
+	font-weight: 800;
+	font-size: 18px;
+	margin-left: 10px;
+}
+
+a,a:visited {
+	color: #4183C4;
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+#about {
+	position: absolute;
+	top: 60px;
+	margin-left: 900px;
+	z-index: 10;
+}
+
+  #about_modal {
+	position: absolute;
+	top: 50px;
+	left:-1000px;
+	width:400px;
+	height: 300px;
+	position: fixed;
+	z-index: 9999;
+	-webkit-transition: left .3s ease-in;
+  }
+
+  #about_modal.active{
+  	left: 50%;
+  	margin-left:-200px;
+  }
+
+#control_panel {
+	margin-bottom: 50px;
+	margin-top: 50px;
+}
+
+#selectbook_div,#uploadfile_div,#editchars_div,#saveviz_div{
+	float: left;
+	margin-right: 50px;
+}
+
+#visualization {
+	margin-top: -50px;
+}
+
+small {
+	font-size: 90%;
+}
+
+.bookTitle:hover { 
+background: #eee;
+ }
+
+.bar {
+	fill: #ddd;
+}
+
+.bar.positive.selected {
+  fill: #f17d1d;
+}
+
+.bar.negative.selected {
+  fill: #119191;
+}
+
+.x.axis path {
+  display: none;
+}
+
+.brush .extent {
+  fill-opacity: 0;
+  shape-rendering: crispEdges;
+}
+
+.brush .resize path {
+  fill: #eee;
+  stroke: #333;
+}
+
+#circle circle {
+  fill: none;
+  pointer-events: all;
+}
+
+.group path {
+  fill-opacity: .9;
+}
+
+path.chord {
+  stroke: #000;
+  stroke-width: .25px;
+}
+
+#circle:hover path.fade {
+  display: none;
+}
+
+#interactor {
+	position: absolute;
+	bottom:50px;
+	left:-1000px;
+	width:400px;
+	height:500px;
+	position: fixed;
+	z-index: 9999;
+	-webkit-transition: left .3s ease-in;
+}
+
+#interactor.active {
+    left: 50px;
+  }
+
+#charselector {
+	visibility: hidden;
+}
+   
+#charslist {
+	height: 200px;
+   	overflow: auto;
+}
+
+#addChar {
+	margin-left: 10px;
+	float: left;
+}
+
+#submit_chars {
+	margin-right: 10px;
+	float: right;
+}
+
+  #copyoutput {
+	position: absolute;
+	top: 50px;
+	/*left:100px;*/
+	left:-1000px;
+	width:400px;
+	height: 300px;
+	position: fixed;
+	z-index: 9999;
+	-webkit-transition: left .3s ease-in;
+  }
+
+  #copyoutput.active{
+  	left: 50%;
+  	margin-left:-240px;
+  }
+
+  #outputtext {
+  	width: 360px;
+  	height: 240px;
+  	padding: 10px 10px 10px 10px;
+  	margin: 10px 10px 10px 10px;
+  	border-radius: 5px;
+  }
+
+        .ko_container {
+            width: 325px;
+            min-height: 50px;
+            background-color: #AAA;
+            padding: 10px;
+        }
+
+
+        .item {
+            background-color: #DDD;
+            cursor: move;
+            text-align: left;
+            padding: 3px;
+            border: black 1px solid;
+        }
+
+        .item input {
+            width: 250px;
+        }       
+		
+		.mjs-nestedSortable-error {
+			background: #fbe3e4;
+			border-color: transparent;
+		}
+		
+		#tree {
+			/*width: 550px;*/
+			margin: 0;
+		}
+		
+		ol {
+			max-width: 350px;
+			padding-left: 25px;
+		}
+		
+		ol.sortable,ol.sortable ol {
+			list-style-type: none;
+		}
+		
+		.sortable li div {
+			border: 1px solid #d4d4d4;
+			-webkit-border-radius: 3px;
+			-moz-border-radius: 3px;
+			border-radius: 3px;
+			cursor: move;
+			border-color: #D4D4D4 #D4D4D4 #BCBCBC;
+			margin: 0;
+			padding: 3px;
+		}
+		
+		li.mjs-nestedSortable-collapsed.mjs-nestedSortable-hovering div {
+			border-color: #999;
+		}
+		
+		.disclose, .expandEditor {
+			cursor: pointer;
+			width: 20px;
+			display: none;
+		}
+		
+		.sortable li.mjs-nestedSortable-collapsed > ol {
+			display: none;
+		}
+		
+		.sortable li.mjs-nestedSortable-branch > div > .disclose {
+			display: inline-block;
+		}
+		
+		.sortable span.ui-icon {
+			display: inline-block;
+			margin: 0;
+			padding: 0;
+		}
+		
+		
+		.menuEdit {
+			background: #FFF;
+		}
+		
+		.itemTitle {
+			vertical-align: middle;
+			margin-top: 5px;
+			margin-left: 3px;
+			cursor: pointer;
+		}
+		
+		.deleteMenu {
+			float: right;
+			cursor: pointer;
+		}
+		
+		p,ol,ul,pre,form {
+			margin-top: 0;
+			margin-bottom: 1em;
+		}
+		
+		dl {
+			margin: 0;
+		}
+		
+		dd {
+			margin: 0;
+			padding: 0 0 0 1.5em;
+		}
+		
+		input {
+			vertical-align: text-bottom;
+		}
+
+		.edit-input {
+		    display:none;
+		}
+		
+		.notice {
+			color: #c33;
+        }
+
+        .btn-file {
+    position: relative;
+    overflow: hidden;
+}
+.btn-file input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 100%;
+    min-height: 100%;
+    font-size: 100px;
+    text-align: right;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    outline: none;
+    background: white;
+    cursor: inherit;
+    display: block;
+}
+
+.scrollable-menu {
+    height: auto;
+    max-height: 110px;
+    overflow-x: hidden;
+}
