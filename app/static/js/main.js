@@ -46,8 +46,6 @@ var arc = d3.svg.arc()
     .innerRadius(r0)
     .outerRadius(r0 + 20);
 
-var nodes;
-
 //add yaxis label
 sentiment_graph.append("g")
     .attr("class", "y axis")
@@ -376,21 +374,20 @@ function updateVisualization(nodes, links) {
 
 function updateLinks(extent) {
   var charwindow = document.getElementById('charwindow_menu').value;
-  var hiered = $('ol.sortable').nestedSortable('toHierarchy', {startDepthCount: 0});
-  var ohiered = outputHierarchy(hiered);
-  var book_id = document.getElementById('visualization').getAttribute('book_id');
   $.ajax({
           type: 'POST',
-          url: '/charlinks/'+book_id,
-          data: JSON.stringify({extent: extent, charwindow: charwindow, nodes: nodes, hierarchy: ohiered}),
+          url: '/charlinks',
+          data: JSON.stringify({extent: extent, charwindow: charwindow, client_key: session_key}),
           contentType: 'application/json;charset=UTF-8',
           processData: false,
           dataType: 'json'
       }).done(function(data, textStatus, jqXHR){
-          updateVisualization(data['nodes'], data['links']);
-          if ($('#interactor').hasClass('active')) {
-            $('#interactor').removeClass('active')
-          }
+          if (!data['status']) {
+            updateVisualization(data['nodes'], data['links']);
+            if ($('#interactor').hasClass('active')) {
+              $('#interactor').removeClass('active')
+            }
+          };
       }).fail(function(data){
           alert('error!');
       });
@@ -451,24 +448,43 @@ function uploadpressed() {
         processData: false,
         dataType: 'json'
     }).done(function(data, textStatus, jqXHR){
-        console.log('File uploaded!');
-        updateSentiment(data['sentiments'], data['sentences']);
-        updateChars(data['book_id'],data['characters']);
-        updateVisualization(data['nodes'], data['links']);
-        nodes = data['nodes'];
-        document.getElementById('bookTitle').innerText = data['title'];
-        document.getElementById('visualization').setAttribute('book_id', data['book_id']);
-        d3.selectAll('#charselector')
-          .style("visibility", "visible");
-        d3.selectAll('.bookTitle')
-          .style("visibility", "visible");
-        if (!($('#interactor').hasClass('active'))) {
-            $('#interactor').addClass('active')
-          }
+      session_key = data['session_key']
+      updateBook();
     }).fail(function(data){
         alert('error!');
     });
 };
+
+function updateBook() {
+  $.ajax({
+    type: 'POST',
+    url: '/update',
+    data: JSON.stringify({client_key: session_key}),
+    contentType: 'application/json;charset=UTF-8',
+    processData: false,
+    dataType: 'json'
+  }).done(function(data, textStatus, jqXHR){
+    if (data['status']) {
+      setTimeout(updateBook, 5000);
+    } else {
+      console.log('File uploaded!');
+      updateSentiment(data['sentiments'], data['sentences']);
+      updateChars(data['book_id'],data['characters']);
+      updateVisualization(data['nodes'], data['links']);
+      document.getElementById('bookTitle').innerText = data['title'];
+      d3.selectAll('#charselector')
+        .style("visibility", "visible");
+      d3.selectAll('.bookTitle')
+        .style("visibility", "visible");
+      if (!($('#interactor').hasClass('active'))) {
+          $('#interactor').addClass('active')
+        };
+    };
+  }).fail(function(data){
+    alert('error!');
+  });
+};
+
 
 $("[id^=select_book]").click(function() {
   $('#charwindow_button').find('.btn').html('5 <span class="caret"></span>');
@@ -482,12 +498,11 @@ $("[id^=select_book]").click(function() {
           processData: false,
           dataType: 'json'
   }).done(function(data, textStatus, jqXHR){
+      session_key=data['id'];
       updateSentiment(data['sentiments'], data['sentences']);
       updateChars(data['book_id'],data['characters']);
       updateVisualization(data['nodes'], data['links']);
-      nodes = data['nodes']
       document.getElementById('bookTitle').innerText = data['title'];
-      document.getElementById('visualization').setAttribute('book_id', data['book_id']);
       d3.selectAll('.bookTitle')
           .style("visibility", "visible");
       brush.extent([0, data['sentences'].length]);
@@ -561,19 +576,20 @@ $(".dropdown-menu.charwindow li a").click(function(){
 $('#exportdata_button').click(function() {
   event.preventDefault();
   var title = document.getElementById('bookTitle').innerText;
-  var book_id = document.getElementById('visualization').getAttribute('book_id');
   $.ajax({
         type: 'POST',
-        url: '/export/'+book_id,
-        data: JSON.stringify({title: title}),
+        url: '/export',
+        data: JSON.stringify({title: title, client_key: session_key}),
         contentType: 'application/json;charset=UTF-8',
         processData: false,
         dataType: 'json'
     }).done(function(data, textStatus, jqXHR){
+        if (!data['status']) {
         $('#copyoutput').addClass('active');
         var output = document.getElementById('outputtext');
         output.innerText = JSON.stringify(data);
         document.getElementById('copyjson').removeAttribute('disabled');
+      };
     }).fail(function(data){
         alert('error!');
     });
@@ -594,30 +610,54 @@ $('#copyjson').click(function() {
 
 $('#saveviz_button').click(function() {
   var title = document.getElementById('bookTitle').innerText;
-  var book_id = document.getElementById('visualization').getAttribute('book_id');
+  console.log('pressed save button')
   $.ajax({
     type: 'POST',
-    url: '/savetodb/'+book_id,
-    data: JSON.stringify({title:title}),
+    url: '/savetodb',
+    data: JSON.stringify({title:title, client_key: session_key}),
     contentType: 'application/json;charset=UTF-8',
     processData: false,
     dataType: 'json'
   }).done(function(data, textStatus, jqXHR){
-    var book_id = data['book_id'];
-    var selector = document.getElementById('selectbook_dropdown');
-    var bookli = document.createElement('li');
-    var booka = document.createElement('a');
-    var bookatext = document.createTextNode(title);
-    booka.setAttribute("href", "#");
-    booka.setAttribute("value", book_id);
-    booka.setAttribute("id", "select_book"+book_id);
-    booka.appendChild(bookatext);
-    bookli.appendChild(booka);
-    selector.appendChild(bookli);
+    if (!data['status']) {
+    updateSave()
+    console.log('saving book')
+    }
     }).fail(function(data){
         alert('error!');
     });
 });
+
+function updateSave() {
+  $.ajax({
+    type: 'POST',
+    url: '/saveupdate',
+    data: JSON.stringify({client_key: session_key}),
+    contentType: 'application/json;charset=UTF-8',
+    processData: false,
+    dataType: 'json'
+  }).done(function(data, textStatus, jqXHR){
+    if (data['status']) {
+      console.log('Save timeout')
+      setTimeout(updateSave, 10000);
+    } else {
+      console.log(data);
+      var book_id = data['book_id'];
+      var selector = document.getElementById('selectbook_dropdown');
+      var bookli = document.createElement('li');
+      var booka = document.createElement('a');
+      var bookatext = document.createTextNode(data['title']);
+      booka.setAttribute("href", "#");
+      booka.setAttribute("value", book_id);
+      booka.setAttribute("id", "select_book"+book_id);
+      booka.appendChild(bookatext);
+      bookli.appendChild(booka);
+      selector.appendChild(bookli);
+    };
+  }).fail(function(data){
+    alert('error!');
+  });
+};
 
 $.fn.inlineEdit = function(replaceWith, connectWith) {
 
@@ -709,19 +749,20 @@ $().ready(function(){
     var ohiered = outputHierarchy(hiered);
     var charwindow = document.getElementById('charwindow_menu').value;
     var extent = brush.extent();
-    var book_id = document.getElementById('visualization').getAttribute('book_id');
     $.ajax({
             type: 'POST',
-            url: '/charajax/'+book_id,
-            data: JSON.stringify({hierarchy: ohiered, charwindow: charwindow, extent: extent}),
+            url: '/charajax',
+            data: JSON.stringify({hierarchy: ohiered, charwindow: charwindow, extent: extent, client_key: session_key}),
             contentType: 'application/json;charset=UTF-8',
             processData: false,
             dataType: 'json'
         }).done(function(data, textStatus, jqXHR){
+          if (!data['status']) {
             updateVisualization(data['nodes'], data['links']);
               if ($('#interactor').hasClass('active')) {
                 $('#interactor').removeClass('active')
       }
+      };
         }).fail(function(data){
             alert('error!');
         });

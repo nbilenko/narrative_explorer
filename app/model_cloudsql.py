@@ -33,6 +33,7 @@ class BookInfo(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.UnicodeText)
     select = db.Column(db.Integer)
+    client_key = db.Column(db.UnicodeText)
 
 class Sentence(db.Model):
     ''' All sentences in the book '''
@@ -100,7 +101,7 @@ class CharacterRecord(db.Model):
     record = db.Column(db.Integer)
 
 def commit_book(current_book, select = 0):
-    new_book = BookInfo(title = current_book['title'], select = select)
+    new_book = BookInfo(title = current_book['title'], select = select, client_key = current_book['id'])
     db.session.add(new_book)
     db.session.commit()
     book_id = new_book.id
@@ -118,16 +119,22 @@ def commit_book(current_book, select = 0):
         db.session.commit()
     return book_id
 
-def save_book(book_id, current_book):
-    book = db.session.query(BookInfo).get(book_id)
-    book.title = current_book['title']
-    book.select = 1
-    db.session.commit()
+def save_book(client_key, current_book):
+    book = db.session.query(BookInfo).filter(BookInfo.client_key == client_key).first()
+    if book:
+        book.title = current_book['title']
+        book.select = 1
+        db.session.commit()
+        book_id = book.id
+    else:
+        book_id = commit_book(current_book, select = 1)
+    return book_id
 
 def load_book(book_id):
     current_book = {}
     book = db.session.query(BookInfo).get(book_id)
     current_book['title'] = book.title
+    current_book['book_id'] = book.id
     text_query = db.session.query(Sentence).filter(Sentence.book_id == book_id).order_by(Sentence.id)
     current_book['sentences'] = [s.sentence for s in text_query]
     sent_query = db.session.query(Sentiment).filter(Sentiment.book_id == book_id).order_by(Sentiment.sentence_id)
@@ -146,7 +153,17 @@ def load_book(book_id):
     current_book["occurrences"] = occurrences
     return current_book
 
-def update_chars(book_id, characters, occurrences):
+def load_book_bykey(client_key):
+    bookq = db.session.query(BookInfo).filter(BookInfo.client_key == client_key).first()
+    if bookq:
+        book = load_book(bookq.id)
+        return book
+    else:
+        return None
+
+def update_chars(client_key, characters, occurrences):
+    bookq = db.session.query(BookInfo).filter(BookInfo.client_key == client_key).first()
+    book_id = bookq.id
     old_characters = []
     old_occurrences = {}
     char_query = db.session.query(Character).filter(Character.book_id == book_id)
@@ -166,8 +183,8 @@ def update_chars(book_id, characters, occurrences):
     for char in remove_list:
         cq = char_query.filter(Character.character == char['title'])
         print cq
-        occ_query.filter(CharacterRecord.character_id == cq.one().id).delete()
-        name_query.filter(CharacterName.character_id == cq.one().id).delete()
+        occ_query.filter(CharacterRecord.character_id == cq.first().id).delete()
+        name_query.filter(CharacterName.character_id == cq.first().id).delete()
         cq.delete()
         db.session.commit()
 
@@ -181,7 +198,7 @@ def update_chars(book_id, characters, occurrences):
         db.session.commit()
 
 def load_selected():
-    book_query = db.session.query(BookInfo).filter(BookInfo.select == 1).filter(BookInfo.title != None)
+    book_query = db.session.query(BookInfo).filter(BookInfo.select == 1).filter(BookInfo.title != None).order_by(BookInfo.title)
     return [{'id': b.id, 'title': b.title} for b in book_query]
 
 def _create_database():
