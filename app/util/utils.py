@@ -15,7 +15,8 @@ def get_occurrences(character, sentences):
 	occurrences = [1*any((True for charname in character["names"] if charname in sent)) for sent in sentences]
 	return occurrences
 
-def get_links(occurrences, characters, n=2, extent = [0, None]):
+def get_nodes_links(characters, occurrences, n=2, extent = [0, None]):
+	nodes = [{"name": char['title'], "occurrences": occurrences[char['title']]} for char in characters]
 	links = []
 	if extent[1]>len(occurrences[characters[0]['title']]):
 		extent[1] = None
@@ -27,7 +28,7 @@ def get_links(occurrences, characters, n=2, extent = [0, None]):
 		for jj in range(len(characters)):
 			if jj>ii:
 				links.append({"source":ii,"target":jj,"value":cooccurrences[ii, jj]})
-	return links
+	return nodes, links
 		
 def rollw(X, d):
 	newX = np.zeros(X.shape)
@@ -38,3 +39,19 @@ def rollw(X, d):
 	else:
 		newX = X
 	return newX
+
+def add_cache_keys(book, session_server_key, session_client_key):
+	newbook = {}
+	for k, v in book.items():
+		newbook[session_server_key+session_client_key+'_'+k] = v
+	return newbook
+
+def strip_cache_keys(book):
+	newbook = {}
+	for k, v in book.items():
+		newk = k.split('_')[1]
+		newbook[newk] = v
+	return newbook
+
+def get_book_keys():
+	return set(['title', 'sentences', 'sentiments', 'characters', 'occurrences'])

@@ -1,0 +1,4 @@
+cron:
+- description: daily database cleaning
+  url: /cleandb
+  schedule: every day 03:00

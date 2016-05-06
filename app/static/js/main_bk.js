@@ -1,12 +1,8 @@
-// START document scope parameters
-
-// Parameters for sentiment graph
 var margin = {top: 30, right: 30, bottom: 10, left: 40},
     width = 960 - margin.left - margin.right,
     height = 200 - margin.top - margin.bottom,
-    barheight = 100;
+    barheight = 100; //this is the height of the sentiment bar graph
 
-// Parameters for cooccurrence graph
 var gmargin = {top: 50, right: 0, bottom: 50, left: 20},
     w = 960 - gmargin.left - gmargin.right,
     h = 500 - gmargin.top - gmargin.bottom,
@@ -21,11 +17,11 @@ var pos_color = "#f17d1d",
 var high_opacity = 0.9;
     low_opacity = 0.2;
 
-//specity length of x axis for sentiment graph
+//specity length of x axis
 var x = d3.scale.linear()
     .range([10, width]);
 
-//specify length of y axis for sentiment graph
+//specify length of y axis
 var y = d3.scale.linear()
     .range([0, barheight])
     .domain([0, 1]);
@@ -65,164 +61,78 @@ sentiment_graph.append("g")
     .append("svg:tspan").style("fill", "black").text('\u2194')
     .append("svg:tspan").style("fill", pos_color).text(" Positive");
 
-var brush = d3.svg.brush()
-  .x(x)
-  .extent([0, 1])
-  .on("brush", brushed)
-  .on("brushend", brushend);
+  var brush = d3.svg.brush()
+    .x(x)
+    .extent([0, 1])
+    .on("brush", brushed)
+    .on("brushend", brushend);
 
-var brushg = sentiment_graph.append("g")
-    .attr("class", "brush")
-    .call(brush);
+  var brushg = sentiment_graph.append("g")
+      .attr("class", "brush")
+      .call(brush);
 
-brushg.selectAll("rect")
-    .attr("height", barheight+margin.top);
-brushg = d3.selectAll('.brush')
-  .attr("visibility", "hidden")
-  .selectAll(".resize")
-  .append("path")
-  .attr("id", "brushhandle")
-  .attr("d", resizePath);
+  brushg.selectAll("rect")
+      .attr("height", barheight+margin.top);
+  brushg = d3.selectAll('.brush')
+    .attr("visibility", "hidden")
+    .selectAll(".resize")
+    .append("path")
+    .attr("id", "brushhandle")
+    .attr("d", resizePath);
 
-// END document scope parameters
-
-// START document ready functions
-$().ready(function() {
-  // START Define tipsy mouseovers for buttons
-  $('#bookTitle').tipsy({
-      fade: true,
-      gravity: 's', 
-      html: true, 
-      title: function() {return "<span style='font-size:14px;'>Click to edit title</span>"}
-  })
-  $('#selectbook_button').tipsy({ 
-      fade: true,
-      gravity: 's', 
-      html: true, 
-      title: function() { return "<span style='font-size:14px;'>Select a visualization from the database</span>";}
-    });
-  $('#uploadbook_button').tipsy({ 
-      fade: true,
-      gravity: 's', 
-      html: true, 
-      title: function() { return "<span style='font-size:14px;'>Upload a text file to create a new visualization</span>";}
-    });
-  $('#editchars_button').tipsy({ 
-      fade: true,
-      gravity: 's', 
-      html: true, 
-      title: function() { return "<span style='font-size:14px;'>Edit characters tracked in the text</span>";}
-    });
-  $('#saveviz_button').tipsy({ 
-      fade: true,
-      gravity: 's', 
-      html: true, 
-      title: function() { return "<span style='font-size:14px;'>Save this visualization to the database</span>";}
-    });
-  $('#exportdata_button').tipsy({ 
-      fade: true,
-      gravity: 's', 
-      html: true, 
-      title: function() { return "<span style='font-size:14px;'>Export visualization data in JSON format</span>";}
-    });
-// END Define tipsy mouseovers for buttons
-
-// START Define title editing
-  var replaceWith = $('<input name="temp" type="text" />'),
-      connectWith = $('input[name="hiddenField"]');
-
-  $('.bookTitle').inlineEdit(replaceWith, connectWith);
-// END Define title editing
-
-// START Define character editing
-  var ns = $('ol.sortable').nestedSortable({
-    forcePlaceholderSize: true,
-    handle: 'div',
-    helper: 'clone',
-    items: 'li',
-    opacity: .6,
-    placeholder: 'placeholder',
-    revert: 250,
-    tabSize: 25,
-    tolerance: 'pointer',
-    toleranceElement: '> div',
-    maxLevels: 2,
-    isTree: true,
-    expandOnHover: 700,
-    startCollapsed: false,
-    change: function(){
-      console.log('Relocated item');
-    }
-  });
-  
-  $('.deleteMenu').attr('title', 'Click to delete item.');
-  $('.itemTitle').attr('title', 'Click to edit name.');
-  $('.menuDiv').attr('title', 'Click to move item.');
-
-  $('.disclose').on('click', function() {
-    $(this).closest('li').toggleClass('mjs-nestedSortable-collapsed').toggleClass('mjs-nestedSortable-expanded');
-    $(this).toggleClass('ui-icon-plusthick').toggleClass('ui-icon-minusthick');
-  });
-  
-  $('.deleteMenu').on("click", function(){
-    var id_str = $(this).attr('data-id');
-    var id = +id_str.split('_')[1];
-    deleteName(id);
+  $().ready(function() {
+    $('#bookTitle').tipsy({
+        fade: true,
+        gravity: 's', 
+        html: true, 
+        title: function() {return "<span style='font-size:14px;'>Click to edit title</span>"}
+    })
+    $('#selectbook_button').tipsy({ 
+        fade: true,
+        gravity: 's', 
+        html: true, 
+        title: function() { return "<span style='font-size:14px;'>Select a visualization from the database</span>";}
+      });
+    $('#uploadbook_button').tipsy({ 
+        fade: true,
+        gravity: 's', 
+        html: true, 
+        title: function() { return "<span style='font-size:14px;'>Upload a text file to create a new visualization</span>";}
+      });
+    $('#editchars_button').tipsy({ 
+        fade: true,
+        gravity: 's', 
+        html: true, 
+        title: function() { return "<span style='font-size:14px;'>Edit characters tracked in the text</span>";}
+      });
+    $('#saveviz_button').tipsy({ 
+        fade: true,
+        gravity: 's', 
+        html: true, 
+        title: function() { return "<span style='font-size:14px;'>Save this visualization to the database</span>";}
+      });
+    $('#exportdata_button').tipsy({ 
+        fade: true,
+        gravity: 's', 
+        html: true, 
+        title: function() { return "<span style='font-size:14px;'>Export visualization data in JSON format</span>";}
+      });
   });
 
-  $('.itemTitle').on("click", function() {
-   var id = $(this).attr('data-id');
-   editName(id);
-  });
-
-  $('#addChar').on("click", function() {
-    var new_char = {'title': "New Character", 'names': ['New Character']};
-    addCharacter(new_char, false);
-  });
-
-  $('#submit_chars').click(function(e){
-    event.preventDefault();
-    var hiered = $('ol.sortable').nestedSortable('toHierarchy', {startDepthCount: 0});
-    var ohiered = outputHierarchy(hiered);
-    var charwindow = document.getElementById('charwindow_menu').value;
-    var extent = brush.extent();
-    $.ajax({
-            type: 'POST',
-            url: '/charedit',
-            data: JSON.stringify({hierarchy: ohiered, charwindow: charwindow, extent: extent, client_key: session_key}),
-            contentType: 'application/json;charset=UTF-8',
-            processData: false,
-            dataType: 'json'
-        }).done(function(data, textStatus, jqXHR){
-          if (!data['status']) {
-            updateVisualization(data['nodes'], data['links']);
-              if ($('#interactor').hasClass('active')) {
-                $('#interactor').removeClass('active')
-      }
-      };
-        }).fail(function(data){
-            $('#error').show();
-        });
-    });
-  // END Define character editing
-});
-// END document ready functions
-
-// START brushing related functions
-function resizePath(d) {
-      var e = +(d == "e"),
-          x = e ? 1.5 : -1.5,
-          y = barheight /2 - margin.top / 2;
-      return "M" + (.5 * x) + "," + y
-          + "A6,6 0 0 " + e + " " + (6.5 * x) + "," + (y + 6)
-          + "V" + (2 * y - 6)
-          + "A6,6 0 0 " + e + " " + (.5 * x) + "," + (2 * y)
-          + "Z"
-          + "M" + (2.5 * x) + "," + (y + 8)
-          + "V" + (2 * y - 8)
-          + "M" + (4.5 * x) + "," + (y + 8)
-          + "V" + (2 * y - 8);
-}
+  function resizePath(d) {
+        var e = +(d == "e"),
+            x = e ? 1.5 : -1.5,
+            y = barheight /2 - margin.top / 2;
+        return "M" + (.5 * x) + "," + y
+            + "A6,6 0 0 " + e + " " + (6.5 * x) + "," + (y + 6)
+            + "V" + (2 * y - 6)
+            + "A6,6 0 0 " + e + " " + (.5 * x) + "," + (2 * y)
+            + "Z"
+            + "M" + (2.5 * x) + "," + (y + 8)
+            + "V" + (2 * y - 8)
+            + "M" + (4.5 * x) + "," + (y + 8)
+            + "V" + (2 * y - 8);
+  }
 function brushed() {
   var extent0 = brush.extent(),
       extent1;
@@ -239,15 +149,6 @@ function brushend() {
     .classed("selected", function(d, i) { if (extent[0] <= i && extent[1] > i) { return true } else { return false };})
 }
 
-// END brushing related functions
-
-// START UPDATING functions
-
-function updateTitle(title) {
-  document.getElementById('bookTitle').innerText = title;
-};
-
-// START update sentiment
 function updateSentiment(data, senttext) {
     d3.selectAll('#yaxis').attr("visibility", "visible");
     x.domain([0, data.length]);
@@ -301,9 +202,7 @@ function updateSentiment(data, senttext) {
 
   console.log('updating sentiment');
 };
-// END update sentiment
 
-// START update graph
 function updateVisualization(nodes, links) {
   d3.selectAll('.brush')
     .attr("visibility", "visible");
@@ -313,14 +212,15 @@ function updateVisualization(nodes, links) {
         gravity: 's', 
         html: true,
         title: function() {return "<span style='font-size:14px;'>The sentiment of each sentence is classified on a scale from strongly negative to strongly positive</span>"}
-    });
+    })
+
   
   $('#brushhandle').tipsy({
         fade: true,
         gravity: 's', 
         html: true,
         title: function() {return "<span style='font-size:14px;'>Drag handles to select a limited section of the text</span>"}
-    });
+    })
 
   d3.selectAll('#editchars_div')
     .style("visibility", "visible");
@@ -331,11 +231,8 @@ function updateVisualization(nodes, links) {
   d3.selectAll('#exportdata_div')
     .style("visibility", "visible");
 
-  d3.selectAll('#windowselector')
-    .style("visibility", "visible");
-
-  var graph = document.getElementById('graph');
-  if ( graph ) { graph.remove(); };
+  var graph = document.getElementById('graph')
+  if ( graph ) { graph.remove(); }
 
   var graph = d3.select("#visualization").append("svg:svg")
     .attr("id", "graph")
@@ -354,8 +251,8 @@ function updateVisualization(nodes, links) {
       matrix[i] = new Array(n);
       for (var ii = 0; ii < n; ii++) {
       matrix[i][ii] = 0;
-      };
-    };
+      }
+    }
 
     links.forEach(function(link) {
     matrix[link.source][link.target] += link.value;
@@ -440,8 +337,9 @@ function updateVisualization(nodes, links) {
           .filter( function(dd, ii) { var linked = 0; links.forEach(function(link) { if ( (link.source == ii && link.value > 0 && link.target == i) || (link.target == ii && link.value > 0 && link.source == i) || (i == ii) ) { linked++; } }); return linked == 0; })
           .transition()
           .style("fill-opacity", opacity);
-    };
   };
+
+}
 
       $("#charnode").tipsy({ 
         fade: true,
@@ -452,10 +350,10 @@ function updateVisualization(nodes, links) {
         }
       });
 
-    function noLinks(graph) {
-        graph.append("svg:text")
-        .text("No links");
-    };
+  function noLinks(graph) {
+      graph.append("svg:text")
+      .text("No links");
+  }
 
     function fadeNodes(opacity) {
       return function(d, i) {
@@ -469,31 +367,11 @@ function updateVisualization(nodes, links) {
           .transition()
             .style("stroke-opacity", opacity)
             .style("fill-opacity", opacity);
-    };
   };
 };
-// END update graph
 
-// START reset graphs
-function resetGraphs(booklength, showchars) {
-  d3.selectAll('.bookTitle')
-    .style("visibility", "visible");
-  d3.selectAll('#charselector')
-    .style("visibility", "visible");
-  if (showchars) {
-    if (!($('#interactor').hasClass('active'))) {
-        $('#interactor').addClass('active')
-      }; } else {
-    if ($('#interactor').hasClass('active')) {
-        $('#interactor').removeClass('active')
-      };
-    };
-  brush.extent([0, booklength]);
-  brush(d3.select(".brush").transition());
 };
-// END reset graphs
 
-// START update links
 function updateLinks(extent) {
   var charwindow = document.getElementById('charwindow_menu').value;
   $.ajax({
@@ -511,13 +389,10 @@ function updateLinks(extent) {
             }
           };
       }).fail(function(data){
-          $('#error').show();
+          alert('error!');
       });
   };
-  // END update links
 
-
-// START DESELECTING CHARACTERS
 $("html").click(function(event) { 
     if(!$(event.target).closest('#charnode').length &&
        !$(event.target).is('#charnode') &&
@@ -559,30 +434,24 @@ function clicked(d, occurrences) {
         .attr("fill", function(dd, i) { if (d.index == i) {return pos_color;} else {return "#000";} })
         .attr("font-size", function(dd, i) { if (d.index == i) {return 14;} else {return 12;} })
 };
-// END DESELECTING CHARACTERS
 
 function uploadpressed() {
-  // Set co-occurrence window button to default (5)
   $('#charwindow_button').find('.btn').html('5 <span class="caret"></span>');
   $('#charwindow_button').find('.btn').val('5');
-  // Prevent default 
-  event.preventDefault();
-  // Get the uploaded file
-  var upload_data = new FormData($('#uploadform')[0]);
-  $.ajax({
+    event.preventDefault();
+    var form_data = new FormData($('#uploadform')[0]);
+    $.ajax({
         type: 'POST',
         url: '/uploadajax',
-        data: upload_data,
+        data: form_data,
         contentType: false,
         processData: false,
         dataType: 'json'
     }).done(function(data, textStatus, jqXHR){
-      // Get the client key from the server
       session_key = data['session_key']
-      // Start the looping update book function
       updateBook();
     }).fail(function(data){
-      $('#error').show();
+        alert('error!');
     });
 };
 
@@ -596,19 +465,23 @@ function updateBook() {
     dataType: 'json'
   }).done(function(data, textStatus, jqXHR){
     if (data['status']) {
-      // Book hasn't been processed yet, try again in 5 seconds
-      // Add waiting wheel here!
       setTimeout(updateBook, 5000);
     } else {
       console.log('File uploaded!');
-      updateTitle(data['title']);
       updateSentiment(data['sentiments'], data['sentences']);
       updateChars(data['characters']);
       updateVisualization(data['nodes'], data['links']);
-      resetGraphs(data['sentences'].length, true);
+      document.getElementById('bookTitle').innerText = data['title'];
+      d3.selectAll('#charselector')
+        .style("visibility", "visible");
+      d3.selectAll('.bookTitle')
+        .style("visibility", "visible");
+      if (!($('#interactor').hasClass('active'))) {
+          $('#interactor').addClass('active')
+        };
     };
   }).fail(function(data){
-    $('#error').show();
+    alert('error!');
   });
 };
 
@@ -619,22 +492,31 @@ $("[id^=select_book]").click(function() {
   event.preventDefault();
   var book_id = $(this).attr('value');
   $.ajax({
-      type: 'POST',
-      url: '/select_book/'+book_id,
-      contentType: false,
-      processData: false,
-      dataType: 'json'
+        type: 'POST',
+        url: '/select_book/'+book_id,
+          contentType: false,
+          processData: false,
+          dataType: 'json'
   }).done(function(data, textStatus, jqXHR){
-      // Get client key from the server
       session_key=data['id'];
-      updateTitle(data['title']);
       updateSentiment(data['sentiments'], data['sentences']);
       updateChars(data['characters']);
       updateVisualization(data['nodes'], data['links']);
-      resetGraphs(data['sentences'].length, false);
+      document.getElementById('bookTitle').innerText = data['title'];
+      d3.selectAll('.bookTitle')
+          .style("visibility", "visible");
+      brush.extent([0, data['sentences'].length]);
+      brush(d3.select(".brush").transition());
+      d3.selectAll('#charselector')
+          .style("visibility", "visible");
+      if ($('#interactor').hasClass('active')) {
+            $('#interactor').removeClass('active')
+          }
   }).fail(function(data){
-      $('#error').show();
+      alert('error!');
   })
+
+
 });
 
 $('#editchars_button').click(function () {
@@ -659,7 +541,6 @@ $('#close_copyoutput').click(function () {
     $('#copyoutput').removeClass('active')
 });
 
-// START About button
 window.addEventListener("keydown", function(e) {
 if (e.keyCode == 191)
   if ($('#about_modal').hasClass('active')) {
@@ -686,22 +567,19 @@ $('#close_about').click(function () {
 $('#close_about_button').click(function () {
     $('#about_modal').removeClass('active')
 });
-// END About button
 
-// START co-occurrence window
 $(".dropdown-menu.charwindow li a").click(function(){
   $('#charwindow_button').find('.btn').html($(this).text() + ' <span class="caret"></span>');
   $('#charwindow_button').find('.btn').val($(this).data('value'));
-  updateLinks(brush.extent());
 });
-// END co-occurrence window
 
 $('#exportdata_button').click(function() {
   event.preventDefault();
+  var title = document.getElementById('bookTitle').innerText;
   $.ajax({
         type: 'POST',
         url: '/export',
-        data: JSON.stringify({client_key: session_key}),
+        data: JSON.stringify({title: title, client_key: session_key}),
         contentType: 'application/json;charset=UTF-8',
         processData: false,
         dataType: 'json'
@@ -713,7 +591,7 @@ $('#exportdata_button').click(function() {
         document.getElementById('copyjson').removeAttribute('disabled');
       };
     }).fail(function(data){
-        $('#error').show();
+        alert('error!');
     });
 });
 
@@ -731,20 +609,22 @@ $('#copyjson').click(function() {
 });
 
 $('#saveviz_button').click(function() {
-  event.preventDefault();
+  var title = document.getElementById('bookTitle').innerText;
   console.log('pressed save button')
   $.ajax({
     type: 'POST',
     url: '/savetodb',
-    data: JSON.stringify({client_key: session_key}),
+    data: JSON.stringify({title:title, client_key: session_key}),
     contentType: 'application/json;charset=UTF-8',
     processData: false,
     dataType: 'json'
   }).done(function(data, textStatus, jqXHR){
+    if (!data['status']) {
     updateSave()
     console.log('saving book')
+    }
     }).fail(function(data){
-        $('#error').show();
+        alert('error!');
     });
 });
 
@@ -767,6 +647,7 @@ function updateSave() {
       var bookli = document.createElement('li');
       var booka = document.createElement('a');
       var bookatext = document.createTextNode(data['title']);
+      booka.setAttribute("href", "#");
       booka.setAttribute("value", book_id);
       booka.setAttribute("id", "select_book"+book_id);
       booka.appendChild(bookatext);
@@ -774,11 +655,10 @@ function updateSave() {
       selector.appendChild(bookli);
     };
   }).fail(function(data){
-    $('#error').show();
+    alert('error!');
   });
 };
 
-// START editing title
 $.fn.inlineEdit = function(replaceWith, connectWith) {
 
     $(this).hover(function() {
@@ -800,25 +680,96 @@ $.fn.inlineEdit = function(replaceWith, connectWith) {
             if ($(this).val() != "") {
                 connectWith.val($(this).val()).change();
                 elem.text($(this).val());
-                console.log($(this).val());
-                $.ajax({
-                  type: 'POST',
-                  url: '/titleedit',
-                  data: JSON.stringify({title:$(this).val(), client_key: session_key}),
-                  contentType: 'application/json;charset=UTF-8',
-                  processData: false,
-                  dataType: 'json'
-            });
             }
 
             $(this).remove();
             elem.show();
         });
     });
-};
-// END editing title
 
-// START character editing functions
+};
+
+$().ready(function(){
+  var replaceWith = $('<input name="temp" type="text" />'),
+      connectWith = $('input[name="hiddenField"]');
+
+  $('.bookTitle').inlineEdit(replaceWith, connectWith);
+
+});
+
+$().ready(function(){
+  var ns = $('ol.sortable').nestedSortable({
+    forcePlaceholderSize: true,
+    handle: 'div',
+    helper: 'clone',
+    items: 'li',
+    opacity: .6,
+    placeholder: 'placeholder',
+    revert: 250,
+    tabSize: 25,
+    tolerance: 'pointer',
+    toleranceElement: '> div',
+    maxLevels: 2,
+    isTree: true,
+    expandOnHover: 700,
+    startCollapsed: false,
+    change: function(){
+      console.log('Relocated item');
+    }
+  });
+  
+  $('.deleteMenu').attr('title', 'Click to delete item.');
+  $('.itemTitle').attr('title', 'Click to edit name.');
+  $('.menuDiv').attr('title', 'Click to move item.');
+
+  $('.disclose').on('click', function() {
+    $(this).closest('li').toggleClass('mjs-nestedSortable-collapsed').toggleClass('mjs-nestedSortable-expanded');
+    $(this).toggleClass('ui-icon-plusthick').toggleClass('ui-icon-minusthick');
+  });
+  
+  $('.deleteMenu').on("click", function(){
+    var id_str = $(this).attr('data-id');
+    var id = +id_str.split('_')[1];
+    deleteName(id);
+  });
+
+  $('.itemTitle').on("click", function() {
+   var id = $(this).attr('data-id');
+   editName(id);
+  });
+
+  $('#addChar').on("click", function() {
+    var new_char = {'title': "New Character", 'names': ['New Character']};
+    addCharacter(new_char, false);
+  });
+
+  $('#submit_chars').click(function(e){
+    event.preventDefault();
+    var hiered = $('ol.sortable').nestedSortable('toHierarchy', {startDepthCount: 0});
+    var ohiered = outputHierarchy(hiered);
+    var charwindow = document.getElementById('charwindow_menu').value;
+    var extent = brush.extent();
+    $.ajax({
+            type: 'POST',
+            url: '/charajax',
+            data: JSON.stringify({hierarchy: ohiered, charwindow: charwindow, extent: extent, client_key: session_key}),
+            contentType: 'application/json;charset=UTF-8',
+            processData: false,
+            dataType: 'json'
+        }).done(function(data, textStatus, jqXHR){
+          if (!data['status']) {
+            updateVisualization(data['nodes'], data['links']);
+              if ($('#interactor').hasClass('active')) {
+                $('#interactor').removeClass('active')
+      }
+      };
+        }).fail(function(data){
+            alert('error!');
+        });
+  })
+
+});
+
 function addCharacter(character, end) {
     var characters = document.getElementById('characters');
     var alists = document.getElementsByClassName("mjs-nestedSortable-expanded");
@@ -967,4 +918,3 @@ function updateChars(characters) {
   addCharacter(characters[j], true);
   }
 }
-// END character editing functions

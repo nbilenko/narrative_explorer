@@ -21,4 +21,3 @@ entrypoint: gunicorn -b :$PORT main:bk_app
 
 runtime_config:
   python_version: 2
-

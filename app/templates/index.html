@@ -34,10 +34,12 @@
             <h4 class="modal-title">About this visualization</h4>
         </div>
         <div class="modal-body">
-		Choose a text from the database or upload your own text file to create a new visualization.<br><br>
-		The sentiment rating of each sentence in the story is shown on a scale from strongly negative to strongly positive. Mouse over each bar to read the sentence.<br><br>
-		The co-occurrences of the characters in the story are displayed in a chord diagram. Click a character's name to highlight the sentences in which they appear. Drag the handles on the sentiment graph to choose a segment of the story.<br><br>
-		<!-- Created by <a href="http://nbilenko.com">Natalia Bilenko</a>, 2016. -->
+		Choose a text to visualize or upload your own text file to create a new visualization.<br><br>
+		The sentiment trajectory of the story is shown based on sentiment polarity classification of each sentence. Mouse over each bar to read the sentence.<br><br>
+		The co-occurrences of characters in the story are displayed in a chord diagram. Click a character's name to highlight the sentences in which they appear. Drag the handles on the sentiment graph to limit co-occurrences to a segment of the story.<br><br>
+        Please limited uploaded text files to 1 Mb.
+        <br><br>
+		&copy; Natalia Bilenko, 2016.
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-primary" id="close_about_button">
@@ -87,6 +89,11 @@
 </div>
 </div>
 
+<div class="alert alert-danger alert-dismissible" role="alert" id="error" style="display:none;">
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+  <strong>Error!</strong> Something went wrong! Please try again.
+</div>
+
 <div id="copyoutput" class="modal-dialog">
     <div class="modal-content">
         <div class="modal-header">
@@ -128,28 +135,29 @@
 		</div>
         </div>
         <div class="modal-footer">
-        	<span style="font-size:14px;">Co-occurrence window (sentences): </span>
-    	<div id="charwindow_button" class="btn-group">
-	    <button type="button" data-toggle="dropdown" class="btn btn-default dropdown-toggle" id="charwindow_menu" value="5">5 <span class="caret"></span></button>
-	    <ul class="dropdown-menu scrollable-menu charwindow">
-	   	<li><a href="#" data-value="3">3</a></li>
-	    <li><a href="#" data-value="5">5</a></li>
-	    <li><a href="#" data-value="7">7</a></li>
-	    <li><a href="#" data-value="9">9</a></li>
-	    <li><a href="#" data-value="11">11</a></li>
-	    <li><a href="#" data-value="13">13</a></li>
-	    <li><a href="#" data-value="15">15</a></li>
-	    <li><a href="#" data-value="17">17</a></li>
-	    <li><a href="#" data-value="19">19</a></li>
-	    <li><a href="#" data-value="21">21</a></li>
-	    </ul>
-		</div>
-        </div>
-        <div class="modal-footer">
 			<button type="button" class="btn btn-default btn-file" id="addChar">Add character</button>
 			<button type="button" class="btn btn-primary btn-file" id="submit_chars">Update visualization</button>
         </div>
     </div>
+</div>
+
+<div id="windowselector" style="visibility:hidden;">
+    <span style="font-size:14px;">Co-occurrence window (sentences):  </span>
+<div id="charwindow_button" class="btn-group">
+<button type="button" data-toggle="dropdown" class="btn btn-default dropdown-toggle" id="charwindow_menu" value="5">5 <span class="caret"></span></button>
+<ul class="dropdown-menu scrollable-menu charwindow">
+<li><a data-value="3">3</a></li>
+<li><a data-value="5">5</a></li>
+<li><a data-value="7">7</a></li>
+<li><a data-value="9">9</a></li>
+<li><a data-value="11">11</a></li>
+<li><a data-value="13">13</a></li>
+<li><a data-value="15">15</a></li>
+<li><a data-value="17">17</a></li>
+<li><a data-value="19">19</a></li>
+<li><a data-value="21">21</a></li>
+</ul>
+</div>
 </div>
 
 <div id="visualization">

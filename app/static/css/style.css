@@ -77,6 +77,13 @@ a:hover {
   	margin-left:-200px;
   }
 
+ #error {
+	position: absolute;
+	top: 100px;
+	margin-left: 0px;
+	z-index: 100;
+}
+
 #control_panel {
 	margin-bottom: 50px;
 	margin-top: 50px;
@@ -85,6 +92,13 @@ a:hover {
 #selectbook_div,#uploadfile_div,#editchars_div,#saveviz_div{
 	float: left;
 	margin-right: 50px;
+}
+
+#windowselector{
+	position: absolute;
+	top: 500px;
+	margin-left: 650px;
+	z-index: 99;
 }
 
 #visualization {

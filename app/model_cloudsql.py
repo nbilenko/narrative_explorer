@@ -1,9 +1,10 @@
 # from __future__ import absolute_import
 import numpy as np
-from sqlalchemy import create_engine
-from sqlalchemy.orm import scoped_session, sessionmaker, relationship
-from sqlalchemy.ext.declarative import declarative_base
+# from sqlalchemy import create_engine
+# from sqlalchemy.orm import scoped_session, sessionmaker
+# from sqlalchemy.ext.declarative import declarative_base
 
+from sqlalchemy.orm import relationship
 from sqlalchemy.schema import Column, ForeignKey
 # from sqlalchemy.dialects.mysql import INTEGER, Float, Text
 # from sqlalchemy.types import Integer, Float, UnicodeText
@@ -11,7 +12,6 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from flask import Flask
 
 db = SQLAlchemy()
-
 
 def init_app(app):
     db.init_app(app)
@@ -129,6 +129,18 @@ def save_book(client_key, current_book):
     else:
         book_id = commit_book(current_book, select = 1)
     return book_id
+
+def delete_unselected():
+    book_query = db.session.query(BookInfo).filter(BookInfo.select == 0)
+    for b in book_query:
+        delete_book(b.id)
+
+def delete_book(book_id):
+    db.session.query(CharacterRecord).filter(CharacterRecord.book_id == book_id).delete()
+    db.session.query(CharacterName).filter(CharacterName.book_id == book_id).delete()
+    db.session.query(Character).filter(Character.book_id == book_id).delete()
+    db.session.query(Sentiment).filter(Sentiment.book_id == book_id).delete()
+    db.session.query(Sentence).filter(Sentence.book_id == book_id).delete()
 
 def load_book(book_id):
     current_book = {}
